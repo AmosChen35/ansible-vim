@@ -1,0 +1,340 @@
+"vim-plug session
+call plug#begin('~/.vim/plugged')
+
+    Plug 'chriskempson/tomorrow-theme', {'rtp':'vim/'}
+
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+
+    Plug 'tpope/vim-fugitive'
+
+    Plug 'scrooloose/nerdtree'
+    Plug 'jlanzarotta/bufexplorer'
+
+call plug#end()
+
+" theme enable.
+syntax enable
+colo Tomorrow-Night
+
+" airline basic setup
+let g:airline_theme='tomorrow'
+let g:airline_powerline_fonts=1
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+" powerline symbols
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+let g:airline_symbols.branch = ''
+let g:airline_symbols.readonly = ''
+let g:airline_symbols.linenr = '☰'
+let g:airline_symbols.maxlinenr = ''
+
+" airline extensions
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#tabline#show_splits = 1
+let g:airline#extensions#tabline#show_tabs = 1
+let g:airline#extensions#tabline#show_tab_nr = 1
+let g:airline#extensions#tabline#show_tab_type = 1
+let g:airline#extensions#tabline#close_symbol = 'x'
+let g:airline#extensions#tabline#show_close_button = 1
+let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
+let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
+
+"change leader key to space key.
+let mapleader=" "
+
+" show line number.
+set nu
+
+" show relative line number.
+set relativenumber
+
+" no backup file.
+set nobackup
+
+" no swap file.
+set noswapfile
+
+" only in case you don't want a backup file while editing.
+set nowritebackup
+
+" no undo file.
+set noundofile
+
+" tab space size
+set tabstop=4
+
+" shift space size.
+set shiftwidth=4
+
+" support adjusting tab to space (command:retab).
+set expandtab
+
+" high light search.
+set hlsearch
+
+" if quite wihtout saving will prompted to save or cancel.
+set confirm
+
+" auto detect file modification and reload.
+set autoread
+
+" auto shift indent
+set autoindent
+
+" file type decide indent format.
+filetype plugin indent on
+
+" enable mouse
+set mouse=a
+
+" this a notification when you type a pair brackets, the cursor will jump front of the
+" symbol area and than back to the orign type position.
+set showmatch
+
+" notify without blink.
+set novisualbell
+
+" show current execute command.
+set showcmd
+
+" disable high-light current insert line.
+autocmd InsertLeave * se nocul
+
+" enable high-light current insert line.
+autocmd InsertEnter * se cul
+
+" access the system clipboard.
+set clipboard=unnamedplus
+
+" show 2 line status.
+set statusline=2
+
+"show individual symbol.
+set invlist
+
+" display unprintable.
+set list
+
+" unprintable chars mapping.
+set listchars=tab:•\ ,trail:•,extends:→,precedes:←
+
+" enable fold.
+set foldenable
+
+" fold rule acording to expr.
+set foldmethod=expr
+
+" custom ford function.
+set foldexpr=GetPotionFold(v:lnum)
+
+" setup fold text format
+set foldtext=FoldText()
+
+highlight Folded ctermbg=240
+highlight Folded ctermfg=230
+
+" key combination
+:nmap <leader>q :q<CR>
+:nmap <leader>w :w<CR>
+:nmap <leader>wq :wq<CR>
+:nmap <leader>m :call ToggleLineNumber()<CR>
+:nmap <leader># :noh<CR>
+:nmap <leader>t :call TabNewWithNERDTree()<CR>
+:nmap <leader><tab> :tabp<CR>
+:nmap gb :bn<cr>
+:nmap <Tab> :bp<cr>
+:nmap bd :bd<cr>
+
+:map <F3> :NERDTreeCWD<CR>
+:map <F4> :call NERDTreeUniqueMirrorToggle()<CR>
+:map <leader>" :ToggleBufExplore<CR>
+
+:inoremap {<CR> {<CR>}<Esc>ko
+:inoremap " ""<Esc>i
+:inoremap ' ''<Esc>i
+:inoremap [ []<Esc>i
+
+:nmap <leader>y "ky
+:nmap <leader>p "kp
+
+function! ToggleLineNumber()
+if &nu == 1
+    set nonu
+    set norelativenumber
+else
+    set nu
+    set relativenumber
+endif
+endfunction
+
+function! QuitAllSplit()
+    call feedkeys("\<C-w>o")
+    quit
+endfunction
+
+function! TabNewWithNERDTree()
+    if(g:NERDTree.ExistsForTab())
+        tabnew
+        call NERDTreeUniqueMirrorToggle()
+    else
+        tabnew
+    endif
+endfunction
+
+function! NERDTreeUniqueMirrorToggle()
+    if(g:NERDTree.ExistsForTab())
+        NERDTreeToggle
+
+        if g:NERDTree.IsOpen()
+            call feedkeys("\<C-w>l")
+        endif
+
+        return
+    endif
+
+    NERDTreeMirror
+
+    if !g:NERDTree.IsOpen()
+        NERDTreeToggle
+    endif
+
+    call feedkeys("\<C-w>l")
+endfunction
+
+" folding options
+nmap <leader>0 :set foldlevel=0<CR>
+nmap <leader>1 :set foldlevel=1<CR>
+nmap <leader>2 :set foldlevel=2<CR>
+nmap <leader>3 :set foldlevel=3<CR>
+nmap <leader>4 :set foldlevel=4<CR>
+nmap <leader>5 :set foldlevel=5<CR>
+nmap <leader>6 :set foldlevel=6<CR>
+nmap <leader>7 :set foldlevel=7<CR>
+nmap <leader>8 :set foldlevel=8<CR>
+nmap <leader>9 :set foldlevel=9<CR>
+nmap <leader>10 :set foldlevel=10<CR>
+nmap <leader>11 :set foldlevel=11<CR>
+nmap <leader>12 :set foldlevel=12<CR>
+nmap <leader>13 :set foldlevel=13<CR>
+nmap <leader>14 :set foldlevel=14<CR>
+nmap <leader>15 :set foldlevel=15<CR>
+nmap <leader>16 :set foldlevel=16<CR>
+nmap <leader>17 :set foldlevel=17<CR>
+nmap <leader>18 :set foldlevel=18<CR>
+nmap <leader>19 :set foldlevel=19<CR>
+nmap <leader>20 :set foldlevel=20<CR>
+
+" fold expr function
+function! GetPotionFold(lnum)
+    if getline(a:lnum) =~? '\v^\s*$'
+        return '-1'
+    endif
+
+    let this_indent = IndentLevel(a:lnum)
+    let next_indent = IndentLevel(NextNonBlankLine(a:lnum))
+
+    if next_indent == this_indent
+        return this_indent
+    elseif next_indent < this_indent
+        return this_indent
+    elseif next_indent > this_indent
+        return '>' . next_indent
+    endif
+endfunction
+
+function! IndentLevel(lnum)
+    return indent(a:lnum) / &shiftwidth
+endfunction
+
+function! NextNonBlankLine(lnum)
+    let numlines = line('$')
+    let current = a:lnum + 1
+
+    while current <= numlines
+        if getline(current) =~? '\v\S'
+            return current
+        endif
+
+        let current += 1
+    endwhile
+
+    return -2
+endfunction
+
+function! FoldText()
+    let lines = v:foldend - v:foldstart
+    return getline(v:foldstart) . '   (level ' . v:foldlevel . ', lines ' . lines . ')'
+endfunction
+
+function s:Kwbd(kwbdStage)
+    if(a:kwbdStage == 1)
+        if(!buflisted(winbufnr(0)))
+            bd!
+            return
+        endif
+
+        let s:kwbdBufNum = bufnr("%")
+        let s:kwbdWinNum = winnr()
+        windo call s:Kwbd(2)
+        execute s:kwbdWinNum . 'wincmd w'
+        let s:buflistedLeft = 0
+        let s:bufFinalJump = 0
+        let l:nBufs = bufnr("$")
+        let l:i = 1
+
+        while(l:i <= l:nBufs)
+            if(l:i != s:kwbdBufNum)
+                if(buflisted(l:i))
+                    let s:buflistedLeft = s:buflistedLeft + 1
+                else
+                    if(bufexists(l:i) && !strlen(bufname(l:i)) && !s:bufFinalJump)
+                        let s:bufFinalJump = l:i
+                    endif
+                endif
+            endif
+            let l:i = l:i + 1
+        endwhile
+
+        if(!s:buflistedLeft)
+            if(s:bufFinalJump)
+                windo if(buflisted(winbufnr(0))) | execute "b! " . s:bufFinalJump | endif
+            else
+                enew
+                let l:newBuf = bufnr("%")
+                windo if(buflisted(winbufnr(0))) | execute "b! " . l:newBuf | endif
+            endif
+
+            execute s:kwbdWinNum . 'wincmd w'
+        endif
+
+        if(bufexists(s:kwbdBufNum) && (buflisted(s:kwbdBufNum) || s:kwbdBufNum == bufnr("%")))
+            execute "confirm bd " . s:kwbdBufNum
+        endif
+
+        if(!s:buflistedLeft)
+            set buflisted
+            set bufhidden=delete
+            set buftype=
+            setlocal noswapfile
+        endif
+    else
+        if(bufnr("%") == s:kwbdBufNum)
+            let prevbufvar = bufnr("#")
+            if(prevbufvar > 0 && buflisted(prevbufvar) && prevbufvar != s:kwbdBufNum)
+                b #
+            else
+                bn
+            endif
+        endif
+    endif
+endfunction
+
+command! Kwbd call s:Kwbd(1)
+nmap bd :Kwbd<CR>

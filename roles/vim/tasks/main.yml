@@ -1,0 +1,16 @@
+---
+- name: Update apt packages
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: Add vim 8.0 repositories
+  apt_repository:
+    repo: 'ppa:jonathonf/vim'
+    validate_certs: no
+
+- name: Install vim 8.0
+  apt:
+    name: vim
+    state: latest
+    install_recommends: yes

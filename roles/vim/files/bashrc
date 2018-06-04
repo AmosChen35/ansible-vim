@@ -1,0 +1,166 @@
+#!/bin/bash
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+GIT_PROMPT_PREFIX="["
+GIT_PROMPT_SUFFIX="]"
+GIT_PROMPT_SEPARATOR="|"
+GIT_PROMPT_BRANCH=""
+GIT_PROMPT_STAGED="👍"
+GIT_PROMPT_CONFLICTS="✖"
+GIT_PROMPT_CHANGED="🔨"
+GIT_PROMPT_SPACE=" "
+GIT_PROMPT_UNTRACKED="?"
+GIT_PROMPT_STASHED="🔖"
+GIT_PROMPT_CLEAN="✔"
+GIT_PROMPT_BEHIND="↓"
+GIT_PROMPT_AHEAD="↑"
+GIT_PROMPT_PREHASH="#"
+
+__git_prompt_read ()
+{
+  local f="$1"
+  shift
+  test -r "$f" && read "$@" <"$f"
+}
+
+function get_hostname {
+  export SHORTNAME=${HOSTNAME}
+}
+
+function user_color {
+  id | grep "ubuntu" > /dev/null
+  RETVAL=$?
+  if [[ $RETVAL == 0 ]]; then
+    usercolor="[38;5;203m";
+  else
+    usercolor="[38;5;143m";
+  fi
+}
+
+function settitle() {
+  u=${USERNAME}
+  h="$u@${HOSTNAME}"
+  echo -ne "\e]2;$h\a\e]1;$h\a";
+}
+
+function replaceSymbols() {
+    # Disable globbing, so a * could be used as symbol here
+    set -f
+
+    if [[ -z ${GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING} ]]; then
+        GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING="🔒"
+    fi
+
+    local VALUE=${1//_AHEAD_/${GIT_PROMPT_AHEAD}}
+    local VALUE1=${VALUE//_BEHIND_/${GIT_PROMPT_BEHIND}}
+    local VALUE2=${VALUE1//_NO_REMOTE_TRACKING_/${GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING}}
+
+    echo ${VALUE2//_PREHASH_/${GIT_PROMPT_PREHASH}}
+
+    # reenable globbing symbols
+    set +f
+}
+
+function parse_git_status(){
+    readarray git_status_fields < <(bash ~/.gitstatus.sh 2>/dev/null)
+
+    if [[ -z "$git_status_fields" ]]; then
+        echo $git_status_fields
+    else
+        local GIT_BRANCH="$(replaceSymbols ${git_status_fields[0]})"
+        local GIT_REMOTE="$(replaceSymbols ${git_status_fields[1]})"
+        if [[ "." == "$GIT_REMOTE" ]]; then
+            unset GIT_REMOTE
+        fi
+
+        local GIT_UPSTREAM_PRIVATE="${git_status_fields[2]}"
+        if [[ "^" == "$GIT_UPSTREAM_PRIVATE" ]]; then
+            unset GIT_UPSTREAM
+        else
+            local GIT_UPSTREAM=${GIT_UPSTREAM_PRIVATE}
+        fi
+
+        local GIT_STAGED=(${git_status_fields[3]})
+        local GIT_CONFLICTS=(${git_status_fields[4]})
+        local GIT_CHANGED=(${git_status_fields[5]})
+        local GIT_UNTRACKED=(${git_status_fields[6]})
+        local GIT_STASHED=(${git_status_fields[7]})
+        local GIT_CLEAN=(${git_status_fields[8]})
+
+        local STATUS=$GIT_PROMPT_PREFIX$GIT_PROMPT_BRANCH$GIT_BRANCH$GIT_PROMPT_SPACE
+
+        if [[ ! -z $GIT_REMOTE ]]; then
+            STATUS=$STATUS$GIT_REMOTE
+        fi
+
+        STATUS=$STATUS$GIT_PROMPT_SEPARATOR
+
+        if [[ "$GIT_STAGED" != "0" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_STAGED$GIT_STAGED
+        fi
+
+        if [[ "$GIT_CONFLICTS" != "0" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_CONFLICTS$GIT_CONFLICTS
+        fi
+
+        if [[ "$GIT_CHANGED" != "0" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_CHANGED$GIT_CHANGED
+        fi
+
+        if [[ "$GIT_UNTRACKED" != "0" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_UNTRACKED$GIT_UNTRACKED
+        fi
+
+        if [[ "$GIT_STASHED" != "0" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_STASHED$GIT_STASHED
+        fi
+
+        if [[ "$GIT_CLEAN" = "1" ]]; then
+            if [[ "${STATUS: -1}" != "$GIT_PROMPT_SEPARATOR" ]]; then
+                STATUS=$STATUS$GIT_PROMPT_SPACE
+            fi
+            STATUS=$STATUS$GIT_PROMPT_CLEAN
+        fi
+
+        local STATUS=$STATUS$GIT_PROMPT_SUFFIX
+
+        echo $STATUS
+    fi
+}
+
+# Set directory colors
+eval `dircolors ~/.dircolors.256dark`
+
+# Set prompt and window title
+inputcolor='[0;37m'
+cwdcolor='[38;5;117m'
+host_name='[38;5;143m'
+user_color
+PROMPT_COMMAND='settitle; get_hostname; history -a;'
+export PS1='\n\[\e${cwdcolor}\][$PWD]$(parse_git_status)\n\[\e${usercolor}\][\u]\[\e${host_name}\][${SHORTNAME}]\[\e${inputcolor}\] $ '
+
+# Aliases
+alias ll='ls -l --color'
+alias ls='ls --color'
+alias grep='grep -n --color'
