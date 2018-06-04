@@ -1,16 +1,70 @@
 ---
-- name: Update apt packages
+- name: update apt packages
+  become: yes
   apt:
     update_cache: yes
     cache_valid_time: 86400 #One day
+  tags: ide
 
-- name: Add vim 8.0 repositories
+- name: add vim 8.0 repositories
+  become: yes
   apt_repository:
     repo: 'ppa:jonathonf/vim'
     validate_certs: no
+  tags: ide
 
-- name: Install vim 8.0
+- name: install curl
+  become: yes
+  apt:
+    name: curl
+    state: latest
+    install_recommends: yes
+  tags: ide
+
+- name: install vim 8.0
+  become: yes
   apt:
     name: vim
     state: latest
     install_recommends: yes
+  tags: ide
+
+- name: create vim-plug directory
+  file: path={{ home_dir }}/.vim/autoload state=directory
+  tags: plugin
+
+- name: install vim-plug
+  get_url:
+    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    dest: "{{ home_dir }}/.vim/autoload/plug.vim"
+  tags: plugin
+
+- name: install vimrc
+  copy: src=vimrc dest={{ home_dir }}/.vimrc mode=0664 force=no
+  tags: plugin
+
+- name: install vim plugin
+  shell: vim +'PlugInstall --sync' +qa
+  tags: plugin
+
+- name: install dircolors.256dark
+  copy: src=dircolors.256dark dest={{ home_dir }}/.dircolors.256dark mode=0664 force=no
+  tags: plugin
+
+- name: install gitstatus.sh
+  copy: src=gitstatus.sh dest={{ home_dir }}/.gitstatus.sh mode=0664 force=no
+  tags: plugin
+
+- name: backup old bashrc
+  copy: src={{ home_dir }}/.bashrc dest={{ home_dir }}/.bashrc.bak mode=0664 force=no
+  tags: plugin
+
+- name: install new bashrc
+  copy: src=bashrc dest={{ home_dir }}/.bashrc mode=0664
+  tags: plugin
+
+- name: install screenrc
+  copy: src=screenrc dest={{ home_dir }}/.screenrc mode=0664 force=no
+  tags: plugin
+
+
