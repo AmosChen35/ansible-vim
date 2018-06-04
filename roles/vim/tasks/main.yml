@@ -13,14 +13,6 @@
     validate_certs: no
   tags: ide
 
-- name: install curl
-  become: yes
-  apt:
-    name: curl
-    state: latest
-    install_recommends: yes
-  tags: ide
-
 - name: install vim 8.0
   become: yes
   apt:

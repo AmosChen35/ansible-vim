@@ -15,7 +15,9 @@ call plug#end()
 
 " theme enable.
 syntax enable
-colo Tomorrow-Night
+if !empty(glob('~/.vim/plugged/tomorrow-theme/vim/colors/Tomorrow.vim'))
+    colo Tomorrow-Night
+endif
 
 " airline basic setup
 let g:airline_theme='tomorrow'
