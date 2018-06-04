@@ -29,6 +29,19 @@
     install_recommends: yes
   tags: ide
 
+- name: install vim-gtk
+  become: yes
+  apt:
+    name: vim-gtk
+    state: latest
+    install_recommends: yes
+  tags: ide
+
+- name: install command vix
+  become: yes
+  copy: src=vix dest=/usr/bin mode=0775 force=no
+  tags: ide
+
 - name: create vim-plug directory
   file: path={{ home_dir }}/.vim/autoload state=directory
   tags: plugin
