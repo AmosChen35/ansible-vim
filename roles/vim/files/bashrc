@@ -159,8 +159,9 @@ host_name='[38;5;143m'
 user_color
 PROMPT_COMMAND='settitle; get_hostname; history -a;'
 export PS1='\n\[\e${cwdcolor}\][$PWD]$(parse_git_status)\n\[\e${usercolor}\][\u]\[\e${host_name}\][${SHORTNAME}]\[\e${inputcolor}\] $ '
+#export PATH="/usr/lib/go-1.10/bin:$PATH"
 
 # Aliases
 alias ll='ls -l --color'
 alias ls='ls --color'
-alias grep='grep -n --color'
+alias grep='grep -n --color=always'
