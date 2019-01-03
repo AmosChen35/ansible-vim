@@ -1,7 +1,7 @@
 ---
 - name: Install Vim
   hosts: develop-server
-  remote_user: ubuntu
+  remote_user: amoschen
 
   roles:
     - vim
